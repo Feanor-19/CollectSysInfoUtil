@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 //! @brief Checks is prog run as sudo. 
 bool is_sudo();
@@ -40,3 +41,6 @@ bool exec_cmd_with_output(const char *cmd_fmt, const char *out_filename,
                           int *error_code_p = NULL, int *exit_status_p = NULL);
 
 void free_OSInfo(OSInfo *ptr);
+
+//! @brief Prints to given `stream` message with error, returned by `exec_cmd_with_output`.
+void print_exec_cmd_with_output_err(FILE *stream, int err, int exit_status);

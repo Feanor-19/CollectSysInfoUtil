@@ -57,7 +57,7 @@ $(BIN) :
 
 .PHONY: run
 run:
-	@$(OUT)
+	@sudo $(OUT)
 
 .PHONY: clean
 clean:

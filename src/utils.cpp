@@ -43,7 +43,7 @@ bool write_os_info_into_file(OSInfo info, const char *filename, int *error_code_
         err = errno;
         goto CleanUp;
     }
-    
+
     printf_res = fprintf(file, "OS: %s\nKernel: %s\nMachine: %s\n", info.os, 
                                                                     info.kernel, 
                                                                     info.machine);
@@ -72,8 +72,8 @@ bool exec_cmd_with_output(const char *cmd_fmt, const char *out_filename,
     int exit_status = 0;
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-security"
-    int cmd_size = snprintf(NULL, 0, cmd_fmt);
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    int cmd_size = snprintf(NULL, 0, cmd_fmt, out_filename);
 #pragma GCC diagnostic pop
 
     char *cmd = (char*) calloc((size_t) cmd_size + 1, sizeof(char));
@@ -136,4 +136,16 @@ void free_OSInfo(OSInfo *ptr)
         ptr->machine = NULL;
         ptr->os = NULL;
     }
+}
+
+void print_exec_cmd_with_output_err(FILE *stream, int err, int exit_status)
+{
+    if      (err == ENOSYS)
+        fprintf(stream, "/bin/sh is somehow not available.\n");
+    else if (err == ECHILD && exit_status == 0)
+        fprintf(stream, "Executed command didn't exit normally.\n");
+    else if (err == ECHILD && exit_status != 0)
+        fprintf(stream, "Executed command exited with non-zero code: %d\n", exit_status);
+    else
+        fprintf(stream, "%s\n", strerror(err));
 }
