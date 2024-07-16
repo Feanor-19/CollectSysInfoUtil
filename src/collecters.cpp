@@ -70,3 +70,20 @@ bool collect_journalctl_last24h(const char *out_filename, int *error_code_p,
 
     return true;
 }
+
+bool collect_dmesg(const char *out_filename, int *error_code_p,
+                   int *exit_status_p)
+{
+    assert(out_filename);
+
+    int err = 0;
+    int exit_status = 0;
+    if (!exec_cmd_with_output("dmesg --reltime --color=never > %s", out_filename, &err, &exit_status))
+    {
+        if (error_code_p) *error_code_p = err;
+        if (exit_status) *exit_status_p = exit_status;
+        return false;
+    }
+
+    return true;
+}

@@ -9,6 +9,7 @@
 #define OS_INFO     OUT_DIR "/" "os_info.txt"
 #define PACKAGES    OUT_DIR "/" "packages.txt"
 #define JOURNALCTL  OUT_DIR "/" "journalctl.txt"
+#define DMESG       OUT_DIR "/" "dmesg.txt"
 
 enum MainRetCodes
 {
@@ -58,6 +59,15 @@ int main()
     if (!collect_journalctl_last24h(JOURNALCTL, &err, &exit_status))
     {
         printf("Can't collect info from journalctl: ");
+        print_exec_cmd_with_output_err(stdout, err, exit_status);
+        printf("Skipping this part...\n\n");
+    }
+
+    err = 0;
+    exit_status = 0;
+    if (!collect_dmesg(DMESG, &err, &exit_status))
+    {
+        printf("Can't collect info from dmesg: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);
         printf("Skipping this part...\n\n");
     }
