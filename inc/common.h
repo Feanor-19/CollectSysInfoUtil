@@ -23,6 +23,7 @@ const char * const ALL_FILES[] =
     PACKAGES,
     JOURNALCTL,
     DMESG,
+    "/etc/hosts",
     "/etc/resolv.conf",
     "/etc/ntp.conf",
     "/etc/krb5.conf",

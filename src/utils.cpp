@@ -12,7 +12,7 @@ bool is_sudo()
     return (getuid() == 0);
 }
 
-bool prep_out_dir(const char *dirname, int *error_code_p)
+bool prep_out_dir(const char *dirname, mode_t mode, int *error_code_p)
 {
     assert(dirname);
 
@@ -21,7 +21,7 @@ bool prep_out_dir(const char *dirname, int *error_code_p)
     if (stat(dirname, &st) != -1)
         return true; // dir already exists
 
-    if (mkdir(dirname, 0644) == -1)
+    if (mkdir(dirname, mode) == -1)
     {
         if (error_code_p) *error_code_p = errno;
         return false;

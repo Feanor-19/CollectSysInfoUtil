@@ -12,21 +12,21 @@ enum MainRetCodes
     RET_PARTLY_OK, // some parts had errors
     RET_NOT_SUDO,  // run not as sudo
     RET_OUT_DIR,   // can't prepare out dir
-    RET_ARCHIVE,
+    RET_ARCHIVE,   // didn't manage to create an archive
 };
 
 int main()
 {
-    // if (!is_sudo())
-    // {
-    //     printf("This program must be run using sudo. Please, try again.\n");
-    //     return RET_NOT_SUDO;
-    // }
+    if (!is_sudo())
+    {
+        printf("This program must be run using sudo. Please, try again.\n");
+        return RET_NOT_SUDO;
+    }
 
     bool is_fully_ok = true;
 
     int err = 0;
-    if (!prep_out_dir(OUT_DIR, &err))
+    if (!prep_out_dir(OUT_DIR, 0644, &err))
     {
         printf("Can't prepare out dir: %s\n", strerror(err));
         return RET_OUT_DIR;
@@ -80,14 +80,10 @@ int main()
 
 
     err = 0;
-    if (archive_files(OUT_ARR, ALL_FILES, &err, stderr))
-    {
-        ;
-    }
-    else
+    if (!archive_files(OUT_ARR, ALL_FILES, &err, stderr))
     {
         printf("Can't make an archive: %s\n", strerror(err));
-        is_fully_ok = false;
+        return RET_ARCHIVE;
     }
 
     if (!is_fully_ok)

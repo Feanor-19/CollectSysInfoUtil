@@ -1,12 +1,20 @@
 # CollectSysInfoUtil
 
-Collects some information about the system and makes an arhive of it. Must be run under sudo.
+Collects some information about the system and makes a gzip arhive of it. Must be run under sudo.
 
 Information to collect:
 - OS, OS version, Kernel version
 - List of installed packages
 - journalctl for last 24 hours
 - dmesg
+- Config files (if they don't exist, a warning is printed):
+- - /etc/hosts
+- - /etc/resolv.conf
+- - /etc/ntp.conf
+- - /etc/krb5.conf
+- - /etc/samba/smb.conf
+- - /etc/nsswitch.conf
+- - /etc/NetworkManager/NetworkManager.conf
 
 ## Build
 
@@ -19,9 +27,7 @@ make
 make run
 ```
 
-## Clean temporary dir with data
-
-(in case it was left by the prog due to some error)
+## Clean dir with data
 
 ```
 make clean_data

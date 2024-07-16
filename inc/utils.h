@@ -15,12 +15,12 @@
 //! @brief Checks is prog run as sudo. 
 bool is_sudo();
 
-//! @brief Creates if needed `dirname`, setting it's permissions to '644'.
+//! @brief Creates if needed `dirname`, setting it's permissions to `mode`.
 //! @param[in] dirname          Directory to prepare.
 //! @param[out] error_code_p    Optional, changed only if `false` is returned.
 //! @return `true` if everything is okay, `false` otherwise 
 //!         and *error_code_p is filled.
-bool prep_out_dir(const char *dirname, int *error_code_p = NULL);
+bool prep_out_dir(const char *dirname, mode_t mode = 0644, int *error_code_p = NULL);
 
 //! @brief Writes given `OSInfo` into file with given `filename`.
 //! @param[in]  info            Info to write into file.
