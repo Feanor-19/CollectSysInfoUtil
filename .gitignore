@@ -1,3 +1,4 @@
 .vscode
 bin/*
 obj/*
+collect_sys_info_data

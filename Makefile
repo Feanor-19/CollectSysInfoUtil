@@ -57,9 +57,12 @@ $(BIN) :
 
 .PHONY: run
 run:
-	$(OUT)
+	@$(OUT)
 
 .PHONY: clean
 clean:
 	rm -f $(OBJFILES) $(OUT)
 
+.PHONY: clean_data
+clean_data:
+	sudo rm -rf collect_sys_info_data
