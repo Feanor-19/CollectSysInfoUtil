@@ -89,7 +89,7 @@ bool exec_cmd_with_output(const char *cmd_fmt, const char *out_filename,
 #pragma GCC diagnostic pop
 
     //DEBUG
-    printf("cmd: %s\n", cmd);
+    //printf("cmd: %s\n", cmd);
 
     if (system(NULL) == 0)
     {
