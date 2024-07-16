@@ -5,6 +5,8 @@ Collects some information about the system and makes an arhive of it. Must be ru
 Information to collect:
 - OS, OS version, Kernel version
 - List of installed packages
+- journalctl for last 24 hours
+- dmesg
 
 ## Build
 

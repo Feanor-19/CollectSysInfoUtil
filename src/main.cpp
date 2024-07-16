@@ -1,15 +1,10 @@
 #include "collecters.h"
 #include "utils.h"
+#include "pack.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-
-#define OUT_DIR     "collect_sys_info_data"
-#define OS_INFO     OUT_DIR "/" "os_info.txt"
-#define PACKAGES    OUT_DIR "/" "packages.txt"
-#define JOURNALCTL  OUT_DIR "/" "journalctl.txt"
-#define DMESG       OUT_DIR "/" "dmesg.txt"
 
 enum MainRetCodes
 {
@@ -17,15 +12,18 @@ enum MainRetCodes
     RET_PARTLY_OK, // some parts had errors
     RET_NOT_SUDO,  // run not as sudo
     RET_OUT_DIR,   // can't prepare out dir
+    RET_ARCHIVE,
 };
 
 int main()
 {
-    if (!is_sudo())
-    {
-        printf("This program must be run using sudo. Please, try again.\n");
-        return RET_NOT_SUDO;
-    }
+    // if (!is_sudo())
+    // {
+    //     printf("This program must be run using sudo. Please, try again.\n");
+    //     return RET_NOT_SUDO;
+    // }
+
+    bool is_fully_ok = true;
 
     int err = 0;
     if (!prep_out_dir(OUT_DIR, &err))
@@ -38,12 +36,17 @@ int main()
     if (collect_OSInfo(&info, &err))
     {
         if (!write_os_info_into_file(info, OS_INFO, &err))
+        {
             printf("Can't write OS info into file \"%s\", error: %s\n", OS_INFO, strerror(err));
-
+            is_fully_ok = false;
+        }
         free_OSInfo(&info);
     }
     else
+    {
         printf("Can't collect OS info: %s\nSkipping this part...\n\n", strerror(err));
+        is_fully_ok = false;
+    }
 
     err = 0;
     int exit_status = 0;
@@ -52,6 +55,7 @@ int main()
         printf("Can't collect installed packages: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);
         printf("Skipping this part...\n\n");
+        is_fully_ok = false;
     }
 
     err = 0;
@@ -61,6 +65,7 @@ int main()
         printf("Can't collect info from journalctl: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);
         printf("Skipping this part...\n\n");
+        is_fully_ok = false;
     }
 
     err = 0;
@@ -70,9 +75,22 @@ int main()
         printf("Can't collect info from dmesg: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);
         printf("Skipping this part...\n\n");
+        is_fully_ok = false;
     }
 
-    if (err)
+
+    err = 0;
+    if (archive_files(OUT_ARR, ALL_FILES, &err, stderr))
+    {
+        ;
+    }
+    else
+    {
+        printf("Can't make an archive: %s\n", strerror(err));
+        is_fully_ok = false;
+    }
+
+    if (!is_fully_ok)
         return RET_PARTLY_OK;
     
     return RET_OK;

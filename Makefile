@@ -31,7 +31,7 @@ INC = inc
 C_EXT   = .cpp
 OBJ_EXT = .o
 
-LIB_NAMES = 
+LIB_NAMES = archive
 
 SOURCES  = $(wildcard $(SRC)/*$(C_EXT))
 OBJFILES = $(patsubst $(SRC)/%,$(OBJ)/%,$(SOURCES:$(C_EXT)=$(OBJ_EXT)))
@@ -57,7 +57,7 @@ $(BIN) :
 
 .PHONY: run
 run:
-	@sudo $(OUT)
+	@$(OUT)
 
 .PHONY: clean
 clean:
@@ -65,4 +65,4 @@ clean:
 
 .PHONY: clean_data
 clean_data:
-	sudo rm -rf collect_sys_info_data
+	sudo rm -rf CollectSysInfoData

@@ -5,6 +5,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+#define FCLOSE(_file) do{   \
+    fclose((_file));          \
+    (_file) = NULL;           \
+}while(0)                   
+
+
 //! @brief Checks is prog run as sudo. 
 bool is_sudo();
 
