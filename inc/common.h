@@ -23,5 +23,11 @@ const char * const ALL_FILES[] =
     PACKAGES,
     JOURNALCTL,
     DMESG,
+    "/etc/resolv.conf",
+    "/etc/ntp.conf",
+    "/etc/krb5.conf",
+    "/etc/samba/smb.conf",
+    "/etc/nsswitch.conf",
+    "/etc/NetworkManager/NetworkManager.conf",
     NULL
 };

@@ -55,8 +55,17 @@ bool archive_files(const char *out, const char * const *filenames,
         struct stat st = {};
         if (stat(*cur_file_p, &st) == -1)
         {
-            err = errno;
-            goto CleanUp;
+            if (errno == ENOENT)
+            {
+                fprintf(warn_stream, "Warning: File to archive not found: %s\n", *cur_file_p);
+                cur_file_p++;
+                continue;
+            }
+            else
+            {
+                err = errno;
+                goto CleanUp;
+            }
         }
 
         archive_entry_copy_stat(entry, &st);
