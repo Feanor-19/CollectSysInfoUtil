@@ -16,6 +16,16 @@ Information to collect:
 - - /etc/nsswitch.conf
 - - /etc/NetworkManager/NetworkManager.conf
 
+## Dependencies
+
+### For usage
+
+- libarchive
+
+### For building
+
+- libarchive-dev
+
 ## Build
 
 ```
