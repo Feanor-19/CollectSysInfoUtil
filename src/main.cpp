@@ -78,6 +78,15 @@ int main()
         is_fully_ok = false;
     }
 
+    err = 0;
+    exit_status = 0;
+    if (!exec_cmd_with_output("lsof -c Xorg > %s", LSOF_XORG, &err, &exit_status))
+    {
+        printf("Can't collect info from lsof about Xorg: ");
+        print_exec_cmd_with_output_err(stdout, err, exit_status);
+        printf("Skipping this part...\n\n");
+        is_fully_ok = false;
+    }
 
     err = 0;
     if (!archive_files(OUT_ARR, ALL_FILES, &err, stderr))

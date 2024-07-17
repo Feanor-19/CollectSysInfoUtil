@@ -31,7 +31,11 @@ INC = inc
 C_EXT   = .cpp
 OBJ_EXT = .o
 
+# these names will be used with `-l` option
 LIB_NAMES = archive
+
+# these names will be used with gnu `-l:` option
+AS_IS_LIB_NAMES = #libarchive.a
 
 SOURCES  = $(wildcard $(SRC)/*$(C_EXT))
 OBJFILES = $(patsubst $(SRC)/%,$(OBJ)/%,$(SOURCES:$(C_EXT)=$(OBJ_EXT)))
@@ -40,10 +44,13 @@ OUT      = $(BIN)/prog
 LIB_SUBST = -l$(lib_name) 
 LIBS      = $(foreach lib_name,$(LIB_NAMES),$(LIB_SUBST))
 
+AS_IS_LIB_SUBST = -l:$(lib_name) 
+AS_IS_LIBS      = $(foreach lib_name,$(AS_IS_LIB_NAMES),$(AS_IS_LIB_SUBST))
+
 $(OUT) : $(OBJFILES) | $(BIN)
 	@echo CFLAGS: $(CFLAGS)
-	@echo $(CC) -o $@ $^ -I $(INC) $(LIBS) 
-	@$(CC) -o $@ $(CFLAGS) $^ -I $(INC) $(LIBS)
+	@echo $(CC) -o $@ $^ -I $(INC) $(LIBS) $(AS_IS_LIBS)
+	@$(CC) -o $@ $(CFLAGS) $^ -I $(INC) $(LIBS) $(AS_IS_LIBS)
 
 $(OBJ)/%$(OBJ_EXT) : $(SRC)/%$(C_EXT) | $(OBJ)
 	@echo $(CC) -c -o $@ $< -I $(INC)
