@@ -6,11 +6,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define OS_INFO     OUT_DIR "/" "os_info.txt"
-#define PACKAGES    OUT_DIR "/" "packages.txt"
-#define JOURNALCTL  OUT_DIR "/" "journalctl.txt"
-#define DMESG       OUT_DIR "/" "dmesg.txt"
-#define LSOF_XORG   OUT_DIR "/" "lsof_xorg.txt"
 
 enum MainRetCodes
 {
@@ -20,6 +15,31 @@ enum MainRetCodes
     RET_OUT_DIR,   // can't prepare out dir
     RET_ARCHIVE,   // didn't manage to create an archive
 };
+
+
+#define OS_INFO     OUT_DIR "/" "os_info.txt"
+#define PACKAGES    OUT_DIR "/" "packages.txt"
+#define JOURNALCTL  OUT_DIR "/" "journalctl.txt"
+#define DMESG       OUT_DIR "/" "dmesg.txt"
+#define LSOF_XORG   OUT_DIR "/" "lsof_xorg.txt"
+
+//! @brief Convenience macro to call `exec_cmd_with_output()` and print its error,
+//! if any.
+//! @note Uses following outside variables:
+//! - err
+//! - exit_status
+//! - is_fully_ok
+#define EXEC_CMD_WITH_OUTPUT(_cmd, _outfile, _err_msg) do{                      \
+    err = 0;                                                                    \
+    exit_status = 0;                                                            \
+    if (!exec_cmd_with_output(_cmd " > %s", (_outfile), &err, &exit_status))    \
+    {                                                                           \
+        printf(_err_msg);                                                       \
+        print_exec_cmd_with_output_err(stderr, err, exit_status);               \
+        printf("Skipping this part...\n\n");                                    \
+        is_fully_ok = false;                                                    \
+    }                                                                           \
+}while(0)                                                       
 
 int main()
 {
@@ -54,45 +74,19 @@ int main()
         is_fully_ok = false;
     }
 
-    err = 0;
     int exit_status = 0;
-    if (!exec_cmd_with_output("dpkg -l > %s", PACKAGES, &err, &exit_status))
-    {
-        printf("Can't collect installed packages: ");
-        print_exec_cmd_with_output_err(stdout, err, exit_status);
-        printf("Skipping this part...\n\n");
-        is_fully_ok = false;
-    }
 
-    err = 0;
-    exit_status = 0;
-    if (!exec_cmd_with_output("journalctl --since \"1 day ago\" > %s", JOURNALCTL, &err, &exit_status))
-    {
-        printf("Can't collect info from journalctl: ");
-        print_exec_cmd_with_output_err(stdout, err, exit_status);
-        printf("Skipping this part...\n\n");
-        is_fully_ok = false;
-    }
+    EXEC_CMD_WITH_OUTPUT("dpkg -l", 
+                         PACKAGES, "Can't collect installed packages: ");
 
-    err = 0;
-    exit_status = 0;
-    if (!exec_cmd_with_output("dmesg --reltime --color=never > %s", DMESG, &err, &exit_status))
-    {
-        printf("Can't collect info from dmesg: ");
-        print_exec_cmd_with_output_err(stdout, err, exit_status);
-        printf("Skipping this part...\n\n");
-        is_fully_ok = false;
-    }
+    EXEC_CMD_WITH_OUTPUT("journalctl --since \"1 day ago\"", 
+                         JOURNALCTL, "Can't collect info from journalctl: ");
 
-    err = 0;
-    exit_status = 0;
-    if (!exec_cmd_with_output("lsof -c Xorg > %s", LSOF_XORG, &err, &exit_status))
-    {
-        printf("Can't collect info from lsof about Xorg: ");
-        print_exec_cmd_with_output_err(stdout, err, exit_status);
-        printf("Skipping this part...\n\n");
-        is_fully_ok = false;
-    }
+    EXEC_CMD_WITH_OUTPUT("dmesg --reltime --color=never", 
+                         DMESG, "Can't collect info from dmesg: ");
+
+    EXEC_CMD_WITH_OUTPUT("lsof -c Xorg", 
+                         LSOF_XORG, "Can't collect info from lsof about Xorg: ");
 
     err = 0;
     if (!archive_files(OUT_ARR, FILES_TO_AR, &err, stderr))
