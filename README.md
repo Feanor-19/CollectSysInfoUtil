@@ -15,6 +15,9 @@ Information to collect:
 - - /etc/samba/smb.conf
 - - /etc/nsswitch.conf
 - - /etc/NetworkManager/NetworkManager.conf
+- - /etc/NetworkManager/NetworkManager.conf
+- - /opt/cyberprotect/protego/etc/config.json
+- - /opt/cyberprotect/protego/logs _(it's a dir, all its files are added)_
 
 ## Dependencies
 
