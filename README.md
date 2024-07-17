@@ -37,6 +37,13 @@ make
 make run
 ```
 
+## One of ways to extract files from resulting archive
+
+```
+mkdir out
+tar -x -f sys_info.gz -C out/
+```
+
 ## Clean dir with data
 
 ```

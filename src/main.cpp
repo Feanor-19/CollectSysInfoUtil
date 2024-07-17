@@ -50,7 +50,7 @@ int main()
 
     err = 0;
     int exit_status = 0;
-    if (!collect_installed_packages(PACKAGES, &err, &exit_status))
+    if (!exec_cmd_with_output("dpkg -l > %s", PACKAGES, &err, &exit_status))
     {
         printf("Can't collect installed packages: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);
@@ -60,7 +60,7 @@ int main()
 
     err = 0;
     exit_status = 0;
-    if (!collect_journalctl_last24h(JOURNALCTL, &err, &exit_status))
+    if (!exec_cmd_with_output("journalctl --since \"1 day ago\" > %s", JOURNALCTL, &err, &exit_status))
     {
         printf("Can't collect info from journalctl: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);
@@ -70,7 +70,7 @@ int main()
 
     err = 0;
     exit_status = 0;
-    if (!collect_dmesg(DMESG, &err, &exit_status))
+    if (!exec_cmd_with_output("dmesg --reltime --color=never > %s", DMESG, &err, &exit_status))
     {
         printf("Can't collect info from dmesg: ");
         print_exec_cmd_with_output_err(stdout, err, exit_status);

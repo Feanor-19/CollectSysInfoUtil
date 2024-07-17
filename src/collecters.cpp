@@ -37,53 +37,65 @@ Failed:
     return false;
 }
 
-bool collect_installed_packages(const char *out_filename, int *error_code_p,
-                                int *exit_status_p)
+bool exec_cmd_with_output(const char *cmd_fmt, const char *out_filename,
+                          int *error_code_p, int *exit_status_p)
 {
+    assert(cmd_fmt);
     assert(out_filename);
 
     int err = 0;
+    int sys_res = 0;
     int exit_status = 0;
-    if (!exec_cmd_with_output("dpkg -l > %s", out_filename, &err, &exit_status))
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    int cmd_size = snprintf(NULL, 0, cmd_fmt, out_filename);
+#pragma GCC diagnostic pop
+
+    char *cmd = (char*) calloc((size_t) cmd_size + 1, sizeof(char));
+    if (!cmd)
     {
-        if (error_code_p) *error_code_p = err;
-        if (exit_status) *exit_status_p = exit_status;
-        return false;
+        err = ENOMEM;
+        goto CleanUp;
     }
 
-    return true;
-}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+    snprintf(cmd, (size_t) cmd_size + 1, cmd_fmt, out_filename);
+#pragma GCC diagnostic pop
 
-bool collect_journalctl_last24h(const char *out_filename, int *error_code_p,
-                                int *exit_status_p)
-{
-    assert(out_filename);
+    //DEBUG
+    //printf("cmd: %s\n", cmd);
 
-    int err = 0;
-    int exit_status = 0;
-    if (!exec_cmd_with_output("journalctl --since \"1 day ago\" > %s", out_filename, &err, &exit_status))
+    if (system(NULL) == 0)
     {
-        if (error_code_p) *error_code_p = err;
-        if (exit_status) *exit_status_p = exit_status;
-        return false;
+        err = ENOSYS; // somehow `/bin/sh` isn't available
+        goto CleanUp;
     }
 
-    return true;
-}
-
-bool collect_dmesg(const char *out_filename, int *error_code_p,
-                   int *exit_status_p)
-{
-    assert(out_filename);
-
-    int err = 0;
-    int exit_status = 0;
-    if (!exec_cmd_with_output("dmesg --reltime --color=never > %s", out_filename, &err, &exit_status))
+    sys_res = system(cmd);
+    if (sys_res == -1)
     {
-        if (error_code_p) *error_code_p = err;
-        if (exit_status) *exit_status_p = exit_status;
-        return false;
+        err = errno;
+        goto CleanUp;
+    }
+    else if (WIFEXITED(sys_res) && WEXITSTATUS(sys_res) != 0)
+    {
+        err = ECHILD;
+        exit_status = WEXITSTATUS(sys_res);
+        goto CleanUp; 
+    }
+    else if(!WIFEXITED(sys_res))
+    {
+        err = ECHILD;
+        exit_status = 0;
     }
 
-    return true;
+CleanUp:
+    free(cmd);
+    bool res = true;
+    if (err) res = false;
+    if (error_code_p)  *error_code_p  = err;
+    if (exit_status_p) *exit_status_p = exit_status;
+    return res;
 }
