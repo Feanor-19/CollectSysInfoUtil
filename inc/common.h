@@ -10,23 +10,13 @@ struct OSInfo
 };
 
 #define OUT_DIR     "CollectSysInfoData"
-
-#define OS_INFO     OUT_DIR "/" "os_info.txt"
-#define PACKAGES    OUT_DIR "/" "packages.txt"
-#define JOURNALCTL  OUT_DIR "/" "journalctl.txt"
-#define DMESG       OUT_DIR "/" "dmesg.txt"
-#define LSOF_XORG   OUT_DIR "/" "lsof_xorg.txt"
-
 #define OUT_ARR     "sys_info.gz"
 
 //! @brief All files which are to be added to an archive.
-const char * const ALL_FILES[] = 
+//! @attention THIS LIST MUST BE NULL-TERMINATED.
+const char * const FILES_TO_AR[] = 
 {
-    OS_INFO,
-    PACKAGES,
-    JOURNALCTL,
-    DMESG,
-    LSOF_XORG,
+    OUT_DIR,
     "/etc/hosts",
     "/etc/resolv.conf",
     "/etc/ntp.conf",
@@ -34,5 +24,7 @@ const char * const ALL_FILES[] =
     "/etc/samba/smb.conf",
     "/etc/nsswitch.conf",
     "/etc/NetworkManager/NetworkManager.conf",
+    "/opt/cyberprotect/protego/etc/config.json",
+    "/opt/cyberprotect/protego/logs",
     NULL
 };

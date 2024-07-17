@@ -6,6 +6,12 @@
 #include <string.h>
 #include <errno.h>
 
+#define OS_INFO     OUT_DIR "/" "os_info.txt"
+#define PACKAGES    OUT_DIR "/" "packages.txt"
+#define JOURNALCTL  OUT_DIR "/" "journalctl.txt"
+#define DMESG       OUT_DIR "/" "dmesg.txt"
+#define LSOF_XORG   OUT_DIR "/" "lsof_xorg.txt"
+
 enum MainRetCodes
 {
     RET_OK = 0,    // no errors occured
@@ -89,7 +95,7 @@ int main()
     }
 
     err = 0;
-    if (!archive_files(OUT_ARR, ALL_FILES, &err, stderr))
+    if (!archive_files(OUT_ARR, FILES_TO_AR, &err, stderr))
     {
         printf("Can't make an archive: %s\n", strerror(err));
         return RET_ARCHIVE;
